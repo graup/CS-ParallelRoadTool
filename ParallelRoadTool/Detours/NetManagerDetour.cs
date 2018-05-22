@@ -140,10 +140,10 @@ namespace ParallelRoadTool.Detours
                 var currentRoadInfos = ParallelRoadTool.SelectedRoadTypes[i];
 
                 // If the user didn't select a NetInfo we'll use the one he's using for the main road
-                var selectedNetInfo = currentRoadInfos.First ?? info;
+                var selectedNetInfo = currentRoadInfos.netInfo ?? info;
                 DebugUtils.Log($"Using netInfo {selectedNetInfo.name}");
 
-                var offset = currentRoadInfos.Second;
+                var offset = currentRoadInfos.offset;
                 DebugUtils.Log($"Using offset {offset}");
 
                 // Get original nodes to clone them

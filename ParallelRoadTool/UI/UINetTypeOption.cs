@@ -25,7 +25,8 @@ namespace ParallelRoadTool.UI
 
         protected override bool PopulateDropDown()
         {
-            DropDown.items = ParallelRoadTool.AvailableRoadTypes
+            return false;
+            /*DropDown.items = ParallelRoadTool.AvailableRoadTypes
                 .Select(ni => ni.GenerateBeautifiedNetName()).ToArray();
             DropDown.selectedIndex = 0;
 
@@ -34,11 +35,12 @@ namespace ParallelRoadTool.UI
             DebugUtils.Log($"UINetTypeOption.PopulateDropDown - Loaded {DropDown.items.Length} items in dropdown.");
 
             return true;
+            */
         }
 
         protected override void OnSelectionChanged(int index)
         {
-            SelectedNetInfo = ParallelRoadTool.AvailableRoadTypes[index];
+            //SelectedNetInfo = ParallelRoadTool.AvailableRoadTypes[index];
 
             DebugUtils.Log($"UINetTypeOption.OnSelectionChanged - Selected net info {SelectedNetInfo.name}");
 

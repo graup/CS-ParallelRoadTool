@@ -18,7 +18,7 @@ namespace ParallelRoadTool
             }
             catch (Exception e)
             {
-                DebugUtils.Log("Could load/create the setting file.");
+                DebugUtils.Log("Could not load/create the setting file.");
                 DebugUtils.LogException(e);
             }
         }

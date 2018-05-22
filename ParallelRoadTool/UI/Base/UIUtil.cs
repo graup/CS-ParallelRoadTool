@@ -12,7 +12,81 @@ namespace ParallelRoadTool.UI.Base
     {
         private const float COLUMN_PADDING = 5f;
         private const float TEXT_FIELD_WIDTH = 35f;
-        private static readonly string kSliderTemplate = "OptionsSliderTemplate";
+
+        [Flags]
+        public enum FindOptions
+        {
+            None = 0,
+            NameContains = 1 << 0
+        }
+
+        public static UIView uiRoot = null;
+
+        // some helper functions from https://github.com/bernardd/Crossings/blob/master/Crossings/UIUtils.cs
+        private static void FindUIRoot()
+        {
+            uiRoot = null;
+
+            foreach (UIView view in UIView.FindObjectsOfType<UIView>())
+            {
+                if (view.transform.parent == null && view.name == "UIView")
+                {
+                    uiRoot = view;
+                    break;
+                }
+            }
+        }
+
+        public static string GetTransformPath(Transform transform)
+        {
+            string path = transform.name;
+            Transform t = transform.parent;
+            while (t != null)
+            {
+                path = t.name + "/" + path;
+                t = t.parent;
+            }
+            return path;
+        }
+
+        public static T FindComponent<T>(string name, UIComponent parent = null, FindOptions options = FindOptions.None) where T : UIComponent
+        {
+            if (uiRoot == null)
+            {
+                FindUIRoot();
+                if (uiRoot == null)
+                {
+                    return null;
+                }
+            }
+
+            foreach (T component in UIComponent.FindObjectsOfType<T>())
+            {
+
+                bool nameMatches;
+                if ((options & FindOptions.NameContains) != 0) nameMatches = component.name.Contains(name);
+                else nameMatches = component.name == name;
+
+                if (!nameMatches) continue;
+
+                Transform parentTransform;
+                if (parent != null) parentTransform = parent.transform;
+                else parentTransform = uiRoot.transform;
+
+                Transform t = component.transform.parent;
+                while (t != null && t != parentTransform)
+                {
+                    t = t.parent;
+                }
+
+                if (t == null) continue;
+
+                return component;
+            }
+
+
+            return null;
+        }
 
         public static UIDropDown CreateDropDownTextFieldWithLabel(out UIButton deleteButton, out UITextField textField,
             UIComponent parent, string labelText, float width)
@@ -53,7 +127,7 @@ namespace ParallelRoadTool.UI.Base
             return dropDown;
         }
 
-        private static UITextField CreateTextField(UIComponent parent)
+        public static UITextField CreateTextField(UIComponent parent)
         {
             var textField = parent.AddUIComponent<UITextField>();
 

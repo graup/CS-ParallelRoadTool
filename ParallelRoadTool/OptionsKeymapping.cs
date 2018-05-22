@@ -13,6 +13,11 @@ namespace ParallelRoadTool
         public static readonly SavedInputKey toggleParallelRoads = new SavedInputKey("toggleParallelRoads",
             ParallelRoadTool.settingsFileName, SavedInputKey.Encode(KeyCode.P, true, false, false), true);
 
+        public static readonly SavedInputKey increaseOffset = new SavedInputKey("increaseOffset",
+            ParallelRoadTool.settingsFileName, SavedInputKey.Encode(KeyCode.Equals, true, true, false), true);
+        public static readonly SavedInputKey decreaseOffset = new SavedInputKey("decreaseOffset",
+            ParallelRoadTool.settingsFileName, SavedInputKey.Encode(KeyCode.Minus, true, false, false), true);
+
         private int count;
 
         private SavedInputKey m_EditingBinding;
@@ -22,6 +27,8 @@ namespace ParallelRoadTool
         private void Awake()
         {
             AddKeymapping("Toggle Parallel Roads", toggleParallelRoads);
+            AddKeymapping("Decrease Offset of Parallel Roads", decreaseOffset);
+            AddKeymapping("Increase Offset of Parallel Roads", increaseOffset);
         }
 
         private void AddKeymapping(string label, SavedInputKey savedInputKey)

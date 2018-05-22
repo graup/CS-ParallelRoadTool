@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace ParallelRoadTool
 {
-    public class OptionsPanel : UIPanel
+    public class UIOptionsPanel : UIPanel
     {
         public UIButton m_addMoreNetworks;
         private UITextureAtlas m_atlas;
@@ -31,41 +31,34 @@ namespace ParallelRoadTool
             atlas = ResourceLoader.GetAtlas("Ingame");
             backgroundSprite = "GenericPanel";
             color = new Color32(206, 206, 206, 255);
-            size = new Vector2(400, 52);
-            relativePosition = new Vector2(8, 92);
+            size = new Vector2(450 - 8*2, 36 + 2*8);
 
             padding = new RectOffset(8, 8, 8, 8);
             autoLayoutPadding = new RectOffset(0, 4, 0, 0);
-            autoLayoutDirection = LayoutDirection.Vertical;
+            autoLayoutDirection = LayoutDirection.Horizontal;
+            autoLayout = true;
+            autoSize = false;
+            //autoFitChildrenVertically = true;
 
-            m_parallel = AddTool("Anarchy", "Toggle parallel road tool test", false);
-
-            m_nettoolSelection = AddUIComponent<UILabel>();
-            m_nettoolSelection.name = "PRT_NetToolSelectionLabel";
-            m_nettoolSelection.textAlignment = UIHorizontalAlignment.Center;
-            m_nettoolSelection.textScale = 1.2f;
-            m_nettoolSelection.text = "Select a network";
-            m_nettoolSelection.autoSize = false;
-            m_nettoolSelection.width = 400 + 8*4;
-            m_nettoolSelection.autoHeight = false;
-            m_nettoolSelection.height = 60;
-
-            m_addMoreNetworks = CreateAddButton(m_nettoolSelection, "Add", "Add this network to the selection", (c, p) =>
-            {
-                // TODO: added networks should also be removable or, as for now, once you add another network you can't removed it anymore
-                // TODO: UI MUST be fixed before release, current one sucks.
-                var selected = new NetTypeItem(netToolSelection, netToolSelection.m_halfWidth);
-                ParallelRoadTool.SelectedRoadTypes.Add(selected);
-                // TODO: update UI
-            });
-
-            m_networks = new List<UINetTypeItem>{
-                // TODO: add current selection item
-            };
+            m_parallel = AddCheckBox("Parallel", "Toggle parallel road tool", false);
+            AddCheckBox("Anarchy", "Toggle parallel road tool", false);
+            AddCheckBox("Anarchy", "Toggle parallel road tool", false);
 
             UpdateOptions();
 
-            autoLayout = true;
+            /*
+m_nettoolSelection = AddUIComponent<UILabel>();
+m_nettoolSelection.name = "PRT_NetToolSelectionLabel";
+m_nettoolSelection.textAlignment = UIHorizontalAlignment.Center;
+m_nettoolSelection.textScale = 1.2f;
+m_nettoolSelection.text = "Select a network";
+m_nettoolSelection.autoSize = false;
+m_nettoolSelection.width = 400 + 8 * 4;
+m_nettoolSelection.autoHeight = false;
+m_nettoolSelection.height = 60;
+*/
+
+
         }
 
         public UICheckBox AddTool(string spriteName, string toolTip, bool value)
@@ -124,46 +117,23 @@ namespace ParallelRoadTool
             if (netToolSelection != sel)
             {
                 netToolSelection = sel;
-                //m_nettoolSelection.text = netToolSelection.GenerateBeautifiedNetName();
+                m_nettoolSelection.text = netToolSelection.GenerateBeautifiedNetName();
                 //m_nettoolSelection.
                 //m_addMoreNetworks.relativePosition = new Vector2(-20, m_nettoolSelection.width);
             }
-            size = new Vector2(400+4*8, 80 + 40* m_networks.Count);
-            */
+            size = new Vector2(400 + 4 * 8, 80 + 40 * m_networks.Count);
             base.Update();
+            */
         }
 
-        private UINetTypeOption CreateNetworksDropdown()
+
+        private UIButton AddButton(string spriteName, string toolTip, MouseEventHandler clickAction)
         {
-            var dropdown = AddUIComponent<UINetTypeOption>();
-            dropdown.relativePosition = Vector2.zero;
-            dropdown.Populate();
-
-            dropdown.OnChangedCallback = () =>
-            {
-                DebugUtils.Log(
-                    $"OptionsPanel.SelectionChangedCallback() - Selected {dropdown.SelectedNetInfo?.name} with offset {dropdown.Offset}");
-                UpdateOptions();
-            };
-
-            dropdown.OnDeleteButtonCallback = () =>
-            {
-                DebugUtils.Log(
-                   $"OptionsPanel.OnDeleteButtonCallback() - Selected {dropdown.SelectedNetInfo?.name} with offset {dropdown.Offset}");
-                UpdateOptions();
-            };
-
-            return dropdown;
-        }
-
-        private UIButton CreateAddButton(UIComponent parent, string spriteName, string toolTip, MouseEventHandler clickAction)
-        {
-            var button = parent.AddUIComponent<UIButton>();
+            var button = AddUIComponent<UIButton>();
             button.name = "PRT_" + spriteName;
             button.atlas = m_atlas;
             button.tooltip = toolTip;
-            button.relativePosition = new Vector2(200, 25);
-            button.size = new Vector2(30, 30);
+            button.size = new Vector2(36, 36);
 
             button.normalBgSprite = "OptionBase";
             button.hoveredBgSprite = "OptionBaseHovered";
@@ -180,16 +150,16 @@ namespace ParallelRoadTool
             return button;
         }
 
-        private UICheckBox CreateCheckBox(UIComponent parent, string spriteName, string toolTip, bool value)
+        private UICheckBox AddCheckBox(string spriteName, string toolTip, bool value)
         {
-            var checkBox = parent.AddUIComponent<UICheckBox>();
+            var checkBox = AddUIComponent<UICheckBox>();
             checkBox.size = new Vector2(36, 36);
 
             var button = checkBox.AddUIComponent<UIButton>();
             button.name = "PRT_" + spriteName;
             button.atlas = m_atlas;
             button.tooltip = toolTip;
-            button.relativePosition = new Vector2(150, -36);
+            button.relativePosition = new Vector2(0, 0);
 
             button.normalBgSprite = "OptionBase";
             button.hoveredBgSprite = "OptionBaseHovered";
@@ -229,19 +199,15 @@ namespace ParallelRoadTool
 
         private void UpdateOptions()
         {
-            DebugUtils.Log("OptionsPanel.UpdateOptions()");
+            DebugUtils.Log("UIOptionsPanel.UpdateOptions()");
 
             ParallelRoadTool.IsParallelEnabled = m_parallel.isChecked;
-            //ParallelRoadTool.SelectedRoadTypes =
-            //    m_networks.Select(n => new Tuple<NetInfo, float>(n.SelectedNetInfo, n.Offset)).ToList();
-            NetManagerDetour.NetworksCount = ParallelRoadTool.SelectedRoadTypes.Count;
-
-            foreach (var item in m_networks) item.enabled = m_parallel.isChecked;
+            
         }
 
         private void LoadResources()
         {
-            string[] spriteNames = 
+            string[] spriteNames =
             {
                 "Anarchy",
                 "AnarchyDisabled",
@@ -253,11 +219,21 @@ namespace ParallelRoadTool
                 "AddFocused",
                 "AddHovered",
                 "AddPressed",
+                "Remove",
+                "RemoveDisabled",
+                "RemoveFocused",
+                "RemoveHovered",
+                "RemovePressed",
                 "Bending",
                 "BendingDisabled",
                 "BendingFocused",
                 "BendingHovered",
-                "BendingPressed"
+                "BendingPressed",
+                "Parallel",
+                "ParallelDisabled",
+                "ParallelFocused",
+                "ParallelHovered",
+                "ParallelPressed"
             };
 
             m_atlas = ResourceLoader.CreateTextureAtlas("ParallelRoadTool", spriteNames, "ParallelRoadTool.Icons.");
